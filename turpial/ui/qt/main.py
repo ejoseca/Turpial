@@ -14,7 +14,7 @@ from functools import partial
 
 from PyQt4.QtGui import (
     QMenu, QImage, QWidget, QAction, QPixmap, QDialog, QMessageBox,
-    QVBoxLayout, QApplication, QFontDatabase, QIcon, QDesktopWidget
+    QVBoxLayout, QApplication, QFontDatabase, QIcon, QDesktopWidget, QCursor
 )
 
 from PyQt4.QtCore import QTimer, pyqtSignal, QRect
@@ -127,6 +127,7 @@ class Main(Base, QWidget):
         self.core.start()
 
         self._container = Container(self)
+        self._container.contextmenu_enabled.connect(self.show_column_contextmenu)
 
         self.os_notifications = OSNotificationSystem(self.images_path)
         self.sounds = SoundSystem(self.sounds_path)
@@ -134,7 +135,7 @@ class Main(Base, QWidget):
         self.dock = Dock(self)
 
         self.dock.accounts_clicked.connect(self.show_accounts_dialog)
-        self.dock.columns_clicked.connect(self.show_column_menu)
+        self.dock.columns_clicked.connect(self.show_column_menu) #not used
         self.dock.search_clicked.connect(self.show_search_dialog)
         self.dock.updates_clicked.connect(self.show_update_box)
         self.dock.messages_clicked.connect(self.show_friends_dialog_for_direct_message)
@@ -310,6 +311,10 @@ class Main(Base, QWidget):
         self.columns_menu = self.build_columns_menu()
         self.columns_menu.exec_(point)
 
+    def show_column_contextmenu(self, column_id):
+        self.column_contextmenu = self.build_column_contextmenu(column_id)
+        self.column_contextmenu.exec_(QCursor.pos())
+
     def show_profile_menu(self, point, profile):
         self.profile_menu = QMenu(self)
 
@@ -479,6 +484,12 @@ class Main(Base, QWidget):
 
         return columns_menu
 
+    def build_column_contextmenu(self, column_id):
+        contextmenu = QMenu(self)
+        contextmenu.addAction(QAction('test0', None))
+
+        return contextmenu
+
     def update_status(self, account_id, message, in_reply_to_id=None):
         self.core.update_status(account_id, message, in_reply_to_id)
 
@@ -634,6 +645,8 @@ class Main(Base, QWidget):
         if self.is_exception(response):
             self._container.error_updating_column(column.id_)
         else:
+            response = self.core.apply_filters(response)              # general filter
+            response = self.core.apply_filters(response, column.id_)  # particular filter
             count = len(response)
             if count > 0:
                 if self.core.get_notify_on_updates():

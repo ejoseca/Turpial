@@ -7,6 +7,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QSize
 from PyQt4.QtCore import QRect
 from PyQt4.QtCore import QLine
+from PyQt4.QtCore import pyqtSignal
 
 from PyQt4.QtGui import QFont
 from PyQt4.QtGui import QColor
@@ -32,6 +33,8 @@ class StatusesColumn(QWidget):
     NOTIFICATION_SUCCESS = 'success'
     NOTIFICATION_WARNING = 'warning'
     NOTIFICATION_INFO = 'notice'
+
+    contextmenu_enabled = pyqtSignal(str) # column_id    
 
     def __init__(self, base, column_id, include_header=True):
         QWidget.__init__(self)
@@ -65,6 +68,9 @@ class StatusesColumn(QWidget):
         layout.addWidget(self.webview, 1)
 
         self.setLayout(layout)
+
+    def contextMenuEvent(self, event):
+        self.contextmenu_enabled.emit(self.id_)
 
     def __build_header(self, column_id):
         self.set_column_id(column_id)

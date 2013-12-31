@@ -366,6 +366,13 @@ class CoreWorker(QThread):
             column.slug, count, last_id), self.__after_update_column,
             (column, count))
 
+    def apply_filters(self, statuses, column_id=None):
+        if column_id is None:
+            statuses = self.core.apply_filters(statuses)
+        else
+            statuses = self.core.apply_filters(statuses, column_id)
+        return statuses
+
     def update_status(self, account_id, message, in_reply_to_id=None):
         self.register(self.core.update_status, (account_id,
             message, in_reply_to_id), self.__after_update_status, account_id)

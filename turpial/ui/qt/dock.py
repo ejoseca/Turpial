@@ -21,7 +21,7 @@ from turpial.ui.qt.widgets import ImageButton
 class Dock(QStatusBar):
 
     accounts_clicked = pyqtSignal()
-    columns_clicked = pyqtSignal(QPoint)
+    columns_clicked = pyqtSignal(QPoint) #not used
     search_clicked = pyqtSignal()
     updates_clicked = pyqtSignal()
     messages_clicked = pyqtSignal()
@@ -78,7 +78,7 @@ class Dock(QStatusBar):
     def __accounts_clicked(self):
         self.accounts_clicked.emit()
 
-    def __columns_clicked(self):
+    def __columns_clicked(self): #not used
         self.columns_clicked.emit(QCursor.pos())
 
     def __search_clicked(self):
