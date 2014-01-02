@@ -14,9 +14,11 @@ from turpial.ui.qt.widgets import Window
 
 
 class FiltersDialog(Window):
-    def __init__(self, base):
-        Window.__init__(self, base, i18n.get('filters'))
+    def __init__(self, base, column_id=""):
+        Window.__init__(self, base, i18n.get('filters')+" "+column_id)
         self.setFixedSize(280, 360)
+
+        self.column_id = str(column_id)
 
         self.expression = QLineEdit()
         self.expression.returnPressed.connect(self.__new_filter)
@@ -61,7 +63,7 @@ class FiltersDialog(Window):
         row = 0
         self.expression.setText('')
         self.list_.clear()
-        for expression in self.base.core.list_filters():
+        for expression in self.base.core.list_filters(self.column_id):
             self.list_.addItem(expression)
             row += 1
 
@@ -104,5 +106,5 @@ class FiltersDialog(Window):
         filters = []
         for i in range(self.list_.count()):
             filters.append(str(self.list_.item(i).text()))
-        self.base.save_filters(filters)
+        self.base.save_filters(filters, self.column_id)
         self.__update()

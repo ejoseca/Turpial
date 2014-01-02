@@ -20,7 +20,7 @@ from libturpial.common import OS_MAC
 from libturpial.common.tools import detect_os
 
 class Container(QVBoxLayout):
-    contextmenu_enabled = pyqtSignal(str) # column_id
+    contextmenu_enabled = pyqtSignal(object, str) # cursor_pos, column_id
 
     def __init__(self, base):
         QVBoxLayout.__init__(self)
@@ -199,6 +199,7 @@ class Container(QVBoxLayout):
         self.columns = {}
         for column in columns:
             self.columns[column.id_] = StatusesColumn(self.base, column.id_)
+            self.columns[column.id_].contextmenu_enabled.connect(self.column_contextmenu_enabled)
             hbox.addWidget(self.columns[column.id_], 1)
 
         viewport = QWidget()
@@ -212,7 +213,7 @@ class Container(QVBoxLayout):
         self.is_empty = False
 
     def column_contextmenu_enabled(self, column_id):
-        self.contextmenu_enabled.emit(column_id)
+        self.contextmenu_enabled.emit(QCursor.pos(), column_id)
 
     def start_updating(self, column_id):
         return self.columns[column_id].start_updating()
@@ -240,8 +241,8 @@ class Container(QVBoxLayout):
             viewport = self.child.widget()
             hbox = viewport.layout()
             self.columns[column_id] = StatusesColumn(self.base, column_id)
+            self.columns[column_id].contextmenu_enabled.connect(self.column_contextmenu_enabled)
             hbox.addWidget(self.columns[column_id], 1)
-        self.columns[column_id].contextmenu_enabled.connect(self.column_contextmenu_enabled)
 
     def remove_column(self, column_id):
         self.columns[column_id].deleteLater()

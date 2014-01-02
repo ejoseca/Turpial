@@ -367,10 +367,7 @@ class CoreWorker(QThread):
             (column, count))
 
     def apply_filters(self, statuses, column_id=None):
-        if column_id is None:
-            statuses = self.core.apply_filters(statuses)
-        else
-            statuses = self.core.apply_filters(statuses, column_id)
+        statuses = self.core.apply_filters(statuses, column_id)
         return statuses
 
     def update_status(self, account_id, message, in_reply_to_id=None):
@@ -497,11 +494,11 @@ class CoreWorker(QThread):
     def delete_cache(self):
         self.register(self.core.delete_cache, None, self.__after_delete_cache)
 
-    def list_filters(self):
-        return self.core.list_filters()
+    def list_filters(self, column_id=None):
+        return self.core.list_filters(column_id)
 
-    def save_filters(self, filters):
-        self.core.save_filters(filters)
+    def save_filters(self, filters, column_id=None):
+        self.core.save_filters(filters, column_id)
 
     def restore_config(self):
         self.core.delete_current_config()

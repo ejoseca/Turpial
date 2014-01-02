@@ -285,8 +285,8 @@ class Main(Base, QWidget):
             criteria = str(search.get_criteria())
             self.add_search_column(account_id, criteria)
 
-    def show_filters_dialog(self):
-        self.filters_dialog = FiltersDialog(self)
+    def show_filters_dialog(self, column_id=""):
+        self.filters_dialog = FiltersDialog(self, column_id)
 
     def show_profile_image(self, account_id, username):
         self.image_view.start_loading()
@@ -311,9 +311,9 @@ class Main(Base, QWidget):
         self.columns_menu = self.build_columns_menu()
         self.columns_menu.exec_(point)
 
-    def show_column_contextmenu(self, column_id):
+    def show_column_contextmenu(self, point, column_id):
         self.column_contextmenu = self.build_column_contextmenu(column_id)
-        self.column_contextmenu.exec_(QCursor.pos())
+        self.column_contextmenu.exec_(point)
 
     def show_profile_menu(self, point, profile):
         self.profile_menu = QMenu(self)
@@ -486,7 +486,9 @@ class Main(Base, QWidget):
 
     def build_column_contextmenu(self, column_id):
         contextmenu = QMenu(self)
-        contextmenu.addAction(QAction('test0', None))
+        filters = QAction(i18n.get('filters'), self)
+        filters.triggered.connect(partial(self.show_filters_dialog, column_id=column_id))
+        contextmenu.addAction(filters)
 
         return contextmenu
 
@@ -569,8 +571,8 @@ class Main(Base, QWidget):
     def clean_cache(self):
         self.core.delete_cache()
 
-    def save_filters(self, filters):
-        self.core.save_filters(filters)
+    def save_filters(self, filters, column_id=None):
+        self.core.save_filters(filters, column_id)
 
     def update_config(self, new_config):
         current_config = self.core.read_config()
